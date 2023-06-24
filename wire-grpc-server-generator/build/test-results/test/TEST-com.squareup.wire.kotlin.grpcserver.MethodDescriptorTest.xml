@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.squareup.wire.kotlin.grpcserver.MethodDescriptorTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-06-24T14:07:14" hostname="bquenaudon-macbookpro.local" time="0.004">
+  <properties/>
+  <testcase name="addMethodDescriptor" classname="com.squareup.wire.kotlin.grpcserver.MethodDescriptorTest" time="0.004"/>
+  <system-out><![CDATA[package routeguide
+
+import io.grpc.MethodDescriptor
+import kotlin.jvm.Volatile
+
+public class RouteGuideWireGrpc {
+  @Volatile
+  private var getGetFeatureMethod: MethodDescriptor<Point, Feature>? = null
+
+  public fun getGetFeatureMethod(): MethodDescriptor<Point, Feature> {
+    var result: MethodDescriptor<Point, Feature>? = getGetFeatureMethod
+    if (result == null) {
+      synchronized(RouteGuideWireGrpc::class) {
+        result = getGetFeatureMethod
+        if (result == null) {
+          getGetFeatureMethod = MethodDescriptor.newBuilder<Point, Feature>()
+            .setType(MethodDescriptor.MethodType.UNARY)
+            .setFullMethodName(
+              MethodDescriptor.generateFullMethodName(
+                "routeguide.RouteGuide", "GetFeature"
+              )
+            )
+            .setSampledToLocalTracing(true)
+            .setRequestMarshaller(RouteGuideImplBase.PointMarshaller())
+            .setResponseMarshaller(RouteGuideImplBase.FeatureMarshaller())
+            .build()
+        }
+      }
+    }
+    return getGetFeatureMethod!!
+  }
+}
+
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

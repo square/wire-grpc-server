@@ -1,0 +1,77 @@
+package routeguide
+
+>import com.squareup.wire.kotlin.grpcserver.MessageSinkAdapter
+@import com.squareup.wire.kotlin.grpcserver.MessageSourceAdapter
+#import io.grpc.stub.StreamObserver
+,import java.util.concurrent.ExecutorService
+
+"public class RouteGuideWireGrpc {
+   public class BindableAdapter(
+1    private val streamExecutor: ExecutorService,
+F    private val GetFeature: () -> RouteGuideGetFeatureBlockingServer,
+J    private val ListFeatures: () -> RouteGuideListFeaturesBlockingServer,
+H    private val RecordRoute: () -> RouteGuideRecordRouteBlockingServer,
+D    private val RouteChat: () -> RouteGuideRouteChatBlockingServer,
+0  ) : RouteGuideWireGrpc.RouteGuideImplBase() {
+Q    override fun GetFeature(request: Point, response: StreamObserver<Feature>) {
+8      response.onNext(GetFeature().GetFeature(request))
+      response.onCompleted()
+    }
+
+W    override fun ListFeatures(request: Rectangle, response: StreamObserver<Feature>) {
+I      ListFeatures().ListFeatures(request, MessageSinkAdapter(response))
+    }
+
+^    override fun RecordRoute(response: StreamObserver<RouteSummary>): StreamObserver<Point> {
+8      val requestStream = MessageSourceAdapter<Point>()
+      streamExecutor.submit {
+B        response.onNext(RecordRoute().RecordRoute(requestStream))
+        response.onCompleted()
+      }
+      return requestStream
+    }
+
+]    override fun RouteChat(response: StreamObserver<RouteNote>): StreamObserver<RouteNote> {
+<      val requestStream = MessageSourceAdapter<RouteNote>()
+      streamExecutor.submit {
+K        RouteChat().RouteChat(requestStream, MessageSinkAdapter(response))
+      }
+      return requestStream
+    }
+  }
+}
+
+package routeguide
+
+ import io.grpc.MethodDescriptor
+import kotlin.jvm.Volatile
+
+"public class RouteGuideWireGrpc {
+  @Volatile
+L  private var getGetFeatureMethod: MethodDescriptor<Point, Feature>? = null
+
+G  public fun getGetFeatureMethod(): MethodDescriptor<Point, Feature> {
+H    var result: MethodDescriptor<Point, Feature>? = getGetFeatureMethod
+    if (result == null) {
+0      synchronized(RouteGuideWireGrpc::class) {
+%        result = getGetFeatureMethod
+        if (result == null) {
+N          getGetFeatureMethod = MethodDescriptor.newBuilder<Point, Feature>()
+8            .setType(MethodDescriptor.MethodType.UNARY)
+             .setFullMethodName(
+7              MethodDescriptor.generateFullMethodName(
+6                "routeguide.RouteGuide", "GetFeature"
+              )
+            )
+,            .setSampledToLocalTracing(true)
+H            .setRequestMarshaller(RouteGuideImplBase.PointMarshaller())
+K            .setResponseMarshaller(RouteGuideImplBase.FeatureMarshaller())
+            .build()
+
+        }
+      }
+    }
+!    return getGetFeatureMethod!!
+  }
+}
+

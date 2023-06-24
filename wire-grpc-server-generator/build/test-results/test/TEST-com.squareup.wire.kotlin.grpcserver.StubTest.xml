@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.squareup.wire.kotlin.grpcserver.StubTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2023-06-24T14:07:14" hostname="bquenaudon-macbookpro.local" time="0.013">
+  <properties/>
+  <testcase name="generates stubs for suspended server streaming rpc" classname="com.squareup.wire.kotlin.grpcserver.StubTest" time="0.003"/>
+  <testcase name="addStub" classname="com.squareup.wire.kotlin.grpcserver.StubTest" time="0.003"/>
+  <testcase name="generates stubs for suspended bidi streaming rpc" classname="com.squareup.wire.kotlin.grpcserver.StubTest" time="0.004"/>
+  <testcase name="generates stubs for suspended client streaming rpc" classname="com.squareup.wire.kotlin.grpcserver.StubTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
