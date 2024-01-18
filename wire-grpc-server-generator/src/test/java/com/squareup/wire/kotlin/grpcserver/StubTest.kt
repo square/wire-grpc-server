@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,47 +18,44 @@ package com.squareup.wire.kotlin.grpcserver
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.wire.buildSchema
-import com.squareup.wire.kotlin.grpcserver.internal.addLocal
+import com.squareup.wire.kotlin.grpcserver.GoldenTestUtils.assertFileEquals
 import okio.Path.Companion.toPath
-import okio.buffer
-import okio.source
-import org.assertj.core.api.Assertions
 import org.junit.Test
-import java.io.File
 import kotlin.test.assertEquals
 
 class StubTest {
-  @Test
-  fun addStub() {
-    val schema = buildSchema { addLocal("src/test/proto/RouteGuideProto.proto".toPath()) }
-    val service = schema.getService("routeguide.RouteGuide")
+    @Test
+    fun addStub() {
+        val schema = buildSchema { addLocal("src/test/proto/RouteGuideProto.proto".toPath()) }
+        val service = schema.getService("routeguide.RouteGuide")
 
-    val code = FileSpec.builder("routeguide", "RouteGuide")
-      .addType(
-        TypeSpec.classBuilder("RouteGuideWireGrpc")
-          .apply {
-            StubGenerator.addStub(
-              generator = ClassNameGenerator(buildClassMap(schema, service!!)),
-              builder = this,
-              service,
-              options = KotlinGrpcGenerator.Companion.Options(
-                singleMethodServices = false,
-                suspendingCalls = false
-              )
+        val code = FileSpec.builder("routeguide", "RouteGuide")
+            .addType(
+                TypeSpec.classBuilder("RouteGuideWireGrpc")
+                    .apply {
+                        StubGenerator.addStub(
+                            generator = ClassNameGenerator(buildClassMap(schema, service!!)),
+                            builder = this,
+                            service,
+                            options = KotlinGrpcGenerator.Companion.Options(
+                                singleMethodServices = false,
+                                suspendingCalls = false,
+                            ),
+                        )
+                    }
+                    .build(),
             )
-          }
-          .build()
-      )
-      .build()
-      .toString()
+            .build()
 
-    Assertions.assertThat(code)
-      .isEqualTo(File("src/test/golden/Stub.kt").source().buffer().readUtf8())
-  }
+        assertFileEquals("Stub.kt", code)
+    }
 
-  @Test
-  fun `generates stubs for suspended bidi streaming rpc`() {
-    val code = stubCodeFor("test", "TestService", """
+    @Test
+    fun `generates stubs for suspended bidi streaming rpc`() {
+        val code = stubCodeFor(
+            "test",
+            "TestService",
+            """
       syntax = "proto2";
       package test;
 
@@ -66,8 +63,10 @@ class StubTest {
       service TestService {
         rpc TestRPC(stream Test) returns (stream Test){}
       }
-      """.trimMargin())
-    assertEquals("""
+            """.trimMargin(),
+        )
+        assertEquals(
+            """
       package test
 
       import io.grpc.CallOptions
@@ -91,12 +90,17 @@ class StubTest {
               getTestRPCMethod(), request, callOptions)
         }
       }
-    """.trimIndent().trim(), code)
-  }
+            """.trimIndent().trim(),
+            code,
+        )
+    }
 
-  @Test
-  fun `generates stubs for suspended server streaming rpc`() {
-    val code = stubCodeFor("test", "TestService", """
+    @Test
+    fun `generates stubs for suspended server streaming rpc`() {
+        val code = stubCodeFor(
+            "test",
+            "TestService",
+            """
       syntax = "proto2";
       package test;
 
@@ -104,8 +108,10 @@ class StubTest {
       service TestService {
         rpc TestRPC(Test) returns (stream Test){}
       }
-      """.trimMargin())
-    assertEquals("""
+            """.trimMargin(),
+        )
+        assertEquals(
+            """
       package test
 
       import io.grpc.CallOptions
@@ -129,12 +135,17 @@ class StubTest {
               getTestRPCMethod(), request, callOptions)
         }
       }
-    """.trimIndent().trim(), code)
-  }
+            """.trimIndent().trim(),
+            code,
+        )
+    }
 
-  @Test
-  fun `generates stubs for suspended client streaming rpc`() {
-    val code = stubCodeFor("test", "TestService", """
+    @Test
+    fun `generates stubs for suspended client streaming rpc`() {
+        val code = stubCodeFor(
+            "test",
+            "TestService",
+            """
       syntax = "proto2";
       package test;
 
@@ -142,8 +153,10 @@ class StubTest {
       service TestService {
         rpc TestRPC(stream Test) returns (Test){}
       }
-      """.trimMargin())
-    assertEquals("""
+            """.trimMargin(),
+        )
+        assertEquals(
+            """
       package test
 
       import io.grpc.CallOptions
@@ -167,25 +180,31 @@ class StubTest {
               getTestRPCMethod(), request, callOptions)
         }
       }
-    """.trimIndent().trim(), code)
-  }
+            """.trimIndent().trim(),
+            code,
+        )
+    }
 
-  private fun stubCodeFor(pkg: String, serviceName: String, schemaCode: String,
-                              options: KotlinGrpcGenerator.Companion.Options = KotlinGrpcGenerator.Companion.Options(
-                                singleMethodServices = false,
-                                suspendingCalls = true
-                              )): String {
-    val schema = buildSchema { add("test.proto".toPath(), schemaCode) }
-    val service = schema.getService("$pkg.$serviceName")!!
-    val typeSpec = TypeSpec.classBuilder("${serviceName}WireGrpc")
-    val nameGenerator = ClassNameGenerator(buildClassMap(schema, service))
+    private fun stubCodeFor(
+        pkg: String,
+        serviceName: String,
+        schemaCode: String,
+        options: KotlinGrpcGenerator.Companion.Options = KotlinGrpcGenerator.Companion.Options(
+            singleMethodServices = false,
+            suspendingCalls = true,
+        ),
+    ): String {
+        val schema = buildSchema { add("test.proto".toPath(), schemaCode) }
+        val service = schema.getService("$pkg.$serviceName")!!
+        val typeSpec = TypeSpec.classBuilder("${serviceName}WireGrpc")
+        val nameGenerator = ClassNameGenerator(buildClassMap(schema, service))
 
-    StubGenerator.addStub(nameGenerator, typeSpec, service, options)
+        StubGenerator.addStub(nameGenerator, typeSpec, service, options)
 
-    return FileSpec.builder(pkg, "test.kt")
-      .addType(typeSpec.build())
-      .build()
-      .toString()
-      .trim()
-  }
+        return FileSpec.builder(pkg, "test.kt")
+            .addType(typeSpec.build())
+            .build()
+            .toString()
+            .trim()
+    }
 }

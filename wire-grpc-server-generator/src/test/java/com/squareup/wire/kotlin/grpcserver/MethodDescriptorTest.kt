@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,39 +18,32 @@ package com.squareup.wire.kotlin.grpcserver
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.wire.buildSchema
-import com.squareup.wire.kotlin.grpcserver.internal.addLocal
+import com.squareup.wire.kotlin.grpcserver.GoldenTestUtils.assertFileEquals
 import okio.Path.Companion.toPath
-import okio.buffer
-import okio.source
-import org.assertj.core.api.Assertions
 import org.junit.Test
-import java.io.File
 
 class MethodDescriptorTest {
 
-  @Test
-  fun addMethodDescriptor() {
-    val schema = buildSchema { addLocal("src/test/proto/RouteGuideProto.proto".toPath()) }
-    val service = schema.getService("routeguide.RouteGuide")
+    @Test
+    fun addMethodDescriptor() {
+        val schema = buildSchema { addLocal("src/test/proto/RouteGuideProto.proto".toPath()) }
+        val service = schema.getService("routeguide.RouteGuide")
 
-    val code = FileSpec.builder("routeguide", "RouteGuide")
-      .addType(
-        TypeSpec.classBuilder("RouteGuideWireGrpc")
-          .apply {
-            MethodDescriptorGenerator.addMethodDescriptor(
-              generator = ClassNameGenerator(buildClassMap(schema, service!!)),
-              builder = this,
-              service = service,
-              rpc = service.rpc("GetFeature")!!
+        val code = FileSpec.builder("routeguide", "RouteGuide")
+            .addType(
+                TypeSpec.classBuilder("RouteGuideWireGrpc")
+                    .apply {
+                        MethodDescriptorGenerator.addMethodDescriptor(
+                            generator = ClassNameGenerator(buildClassMap(schema, service!!)),
+                            builder = this,
+                            service = service,
+                            rpc = service.rpc("GetFeature")!!,
+                        )
+                    }
+                    .build(),
             )
-          }
-          .build()
-      )
-      .build()
-      .toString()
+            .build()
 
-    println(code)
-    Assertions.assertThat(code)
-      .isEqualTo(File("src/test/golden/MethodDescriptor.kt").source().buffer().readUtf8())
-  }
+        assertFileEquals("MethodDescriptor.kt", code)
+    }
 }

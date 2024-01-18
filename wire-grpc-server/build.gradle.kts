@@ -1,12 +1,10 @@
-import com.vanniktech.maven.publish.KotlinJvm
-import com.vanniktech.maven.publish.MavenPublishBaseExtension
 
 plugins {
   id("java-library")
   kotlin("jvm")
-  id("com.vanniktech.maven.publish.base")
-  id("binary-compatibility-validator")
 }
+
+
 
 dependencies {
   implementation(libs.wire.runtime)
@@ -14,8 +12,10 @@ dependencies {
   implementation(libs.grpc.stub) {
     exclude(group = "com.google.guava", module = "guava")
   }
-  implementation("com.google.guava:guava:21.0")
+  implementation(libs.checker.qual)
+  implementation(libs.guava)
   implementation(libs.kotlin.coroutines.core)
+  testImplementation(libs.wire.schemaHandlerTests)
   testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.truth)
   testImplementation(libs.assertj)

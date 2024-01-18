@@ -25,12 +25,6 @@ Cutting a JVM Release
     sed -i "" \
       "s/VERSION_NAME=.*/VERSION_NAME=$RELEASE_VERSION/g" \
       `find . -name "gradle.properties"`
-    sed -i "" \
-      "s/\"com.squareup.wire:\([^\:]*\):[^\"]*\"/\"com.squareup.wire:\1:$RELEASE_VERSION\"/g" \
-      `find . -name "README.md"`
-    sed -i "" \
-      "s/\<version\>\([^<]*\)\<\/version\>/\<version\>$RELEASE_VERSION\<\/version\>/g" \
-      `find . -name "README.md"`
     ```
 
 4. Tag the release and push to GitHub.
@@ -53,57 +47,8 @@ Cutting a JVM Release
     git push
     ```
 
-7. Wait for [GitHub Actions][github_actions] to build and publish releases for both Windows and
-   Non-Windows.
-
-8. Visit [Sonatype Nexus][sonatype_nexus] to promote (close then release) the releases. Or drop it
-   if there is a problem!
-
-9. Deploy the documentation website.
-
-    ```
-    ./deploy_website.sh
-    ```
+7. CI will release the artifacts and publish the website.
 
  [sonatype_issues]: https://issues.sonatype.org/
  [sonatype_nexus]: https://s01.oss.sonatype.org/
- [github_actions]: https://github.com/square/wire/actions
-
-
-Publishing the Swift CocoaPods
-------------------------------
-
-There are two Podspecs to publish to CocoaPods: the Swift Wire runtime and the Swift Wire compiler. The same version number should be used for both.
-
-CocoaPods are published to the [trunk](https://blog.cocoapods.org/CocoaPods-Trunk/) repo, which is the main public repo for all CocoaPods. If you have not published Wire before then you'll need to [get set up to publish to trunk](https://guides.cocoapods.org/making/getting-setup-with-trunk.html), and be added as a publisher for the Wire Podspecs.
-
-### Setting the Version
-
-When publishing a new version, two things must be done:
-1. The version must be tagged in Git. So if you're publishing version `4.0.0-alpha1`, then you'd check out the SHA you want to publish and run:
-```
-git tag 4.0.0-alpha1
-git push origin refs/tags/4.0.0-alpha1
-```
-
-2. The version being published needs to be passed into the Podspecs. This is done by setting the `POD_VERSION` environment variable:
-```
-export POD_VERSION=4.0.0-alpha1
-```
-
-If publishing a release version (like `4.0.0` rather than `4.0.0-alpha1`) then setting the `POD_VERSION` is optional and it will be pulled automatically from `gradle.properties`.
-
-### Publishing the Podspecs
-
-After setting the version as described above, you can publish the two Podspecs by doing:
-
-```
-# Tests are currently failing, thus --skip-tests is required
-pod trunk push Wire.podspec --skip-tests
-```
-
-and
-
-```
-pod trunk push WireCompiler.podspec
-```
+ [github_actions]: https://github.com/square/wire-grpc-server/actions

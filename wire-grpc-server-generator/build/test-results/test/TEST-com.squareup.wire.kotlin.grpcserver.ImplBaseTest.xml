@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.squareup.wire.kotlin.grpcserver.ImplBaseTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-06-24T14:07:14" hostname="bquenaudon-macbookpro.local" time="0.017">
+<testsuite name="com.squareup.wire.kotlin.grpcserver.ImplBaseTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-01-18T16:00:47" hostname="bquenaudon-macbookpro.local" time="0.01">
   <properties/>
-  <testcase name="addImplBase" classname="com.squareup.wire.kotlin.grpcserver.ImplBaseTest" time="0.017"/>
+  <testcase name="addImplBase" classname="com.squareup.wire.kotlin.grpcserver.ImplBaseTest" time="0.01"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

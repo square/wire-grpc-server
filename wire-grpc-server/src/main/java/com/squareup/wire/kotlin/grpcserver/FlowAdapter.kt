@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,47 +32,47 @@ import kotlin.coroutines.CoroutineContext
  */
 object FlowAdapter {
 
-  fun <I : Any, O : Any> serverStream(
-    context: CoroutineContext,
-    request: I,
-    f: suspend (I, SendChannel<O>) -> Unit
-  ): Flow<O> {
-    val sendChannel = Channel<O>()
+    fun <I : Any, O : Any> serverStream(
+        context: CoroutineContext,
+        request: I,
+        f: suspend (I, SendChannel<O>) -> Unit,
+    ): Flow<O> {
+        val sendChannel = Channel<O>()
 
-    CoroutineScope(context).launch { f(request, sendChannel) }
-    return sendChannel.consumeAsFlow()
-  }
-
-  suspend fun <I : Any, O : Any> clientStream(
-    context: CoroutineContext,
-    request: Flow<I>,
-    f: suspend (ReceiveChannel<I>) -> O
-  ): O {
-    val receiveChannel = Channel<I>()
-
-    CoroutineScope(context).launch {
-      request
-        .onCompletion { receiveChannel.close() }
-        .collect { receiveChannel.send(it) }
+        CoroutineScope(context).launch { f(request, sendChannel) }
+        return sendChannel.consumeAsFlow()
     }
-    return f(receiveChannel)
-  }
 
-  fun <I : Any, O : Any> bidiStream(
-    context: CoroutineContext,
-    request: Flow<I>,
-    f: suspend (ReceiveChannel<I>, SendChannel<O>) -> Unit
-  ): Flow<O> {
-    val sendChannel = Channel<O>()
-    val receiveChannel = Channel<I>()
+    suspend fun <I : Any, O : Any> clientStream(
+        context: CoroutineContext,
+        request: Flow<I>,
+        f: suspend (ReceiveChannel<I>) -> O,
+    ): O {
+        val receiveChannel = Channel<I>()
 
-    CoroutineScope(context).launch {
-      request
-        .onCompletion { receiveChannel.close() }
-        .collect { receiveChannel.send(it) }
+        CoroutineScope(context).launch {
+            request
+                .onCompletion { receiveChannel.close() }
+                .collect { receiveChannel.send(it) }
+        }
+        return f(receiveChannel)
     }
-    CoroutineScope(context).launch { f(receiveChannel, sendChannel) }
 
-    return sendChannel.consumeAsFlow()
-  }
+    fun <I : Any, O : Any> bidiStream(
+        context: CoroutineContext,
+        request: Flow<I>,
+        f: suspend (ReceiveChannel<I>, SendChannel<O>) -> Unit,
+    ): Flow<O> {
+        val sendChannel = Channel<O>()
+        val receiveChannel = Channel<I>()
+
+        CoroutineScope(context).launch {
+            request
+                .onCompletion { receiveChannel.close() }
+                .collect { receiveChannel.send(it) }
+        }
+        CoroutineScope(context).launch { f(receiveChannel, sendChannel) }
+
+        return sendChannel.consumeAsFlow()
+    }
 }

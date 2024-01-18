@@ -1,54 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2023-06-24T14:07:11" hostname="bquenaudon-macbookpro.local" time="0.321">
+<testsuite name="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2024-01-18T16:00:44" hostname="bquenaudon-macbookpro.local" time="0.38">
   <properties/>
-  <testcase name="works on suspending streaming bidi rpcs with single method services" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.261"/>
-  <testcase name="works on suspending streaming requests" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.009"/>
-  <testcase name="legacyAdapter" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.037"/>
-  <testcase name="works on suspending streaming responses" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.008"/>
-  <testcase name="works on suspending streaming bidi rpcs" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.006"/>
-  <system-out><![CDATA[package routeguide
-
-import com.squareup.wire.kotlin.grpcserver.MessageSinkAdapter
-import com.squareup.wire.kotlin.grpcserver.MessageSourceAdapter
-import io.grpc.stub.StreamObserver
-import java.util.concurrent.ExecutorService
-
-public class RouteGuideWireGrpc {
-  public class BindableAdapter(
-    private val streamExecutor: ExecutorService,
-    private val GetFeature: () -> RouteGuideGetFeatureBlockingServer,
-    private val ListFeatures: () -> RouteGuideListFeaturesBlockingServer,
-    private val RecordRoute: () -> RouteGuideRecordRouteBlockingServer,
-    private val RouteChat: () -> RouteGuideRouteChatBlockingServer,
-  ) : RouteGuideWireGrpc.RouteGuideImplBase() {
-    override fun GetFeature(request: Point, response: StreamObserver<Feature>) {
-      response.onNext(GetFeature().GetFeature(request))
-      response.onCompleted()
-    }
-
-    override fun ListFeatures(request: Rectangle, response: StreamObserver<Feature>) {
-      ListFeatures().ListFeatures(request, MessageSinkAdapter(response))
-    }
-
-    override fun RecordRoute(response: StreamObserver<RouteSummary>): StreamObserver<Point> {
-      val requestStream = MessageSourceAdapter<Point>()
-      streamExecutor.submit {
-        response.onNext(RecordRoute().RecordRoute(requestStream))
-        response.onCompleted()
-      }
-      return requestStream
-    }
-
-    override fun RouteChat(response: StreamObserver<RouteNote>): StreamObserver<RouteNote> {
-      val requestStream = MessageSourceAdapter<RouteNote>()
-      streamExecutor.submit {
-        RouteChat().RouteChat(requestStream, MessageSinkAdapter(response))
-      }
-      return requestStream
-    }
-  }
-}
-
-]]></system-out>
+  <testcase name="works on suspending streaming bidi rpcs with single method services" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.315"/>
+  <testcase name="works on suspending streaming requests" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.01"/>
+  <testcase name="legacyAdapter" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.04"/>
+  <testcase name="works on suspending streaming responses" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.007"/>
+  <testcase name="works on suspending streaming bidi rpcs" classname="com.squareup.wire.kotlin.grpcserver.BindableAdapterTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
