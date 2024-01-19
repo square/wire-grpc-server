@@ -22,7 +22,7 @@ wire {
 
 dependencies {
   implementation(projects.samples.wireGrpcSample.protos)
-  implementation(projects.wireGrpcServer)
+  implementation(projects.server)
   implementation(libs.wire.runtime)
   implementation(libs.grpc.netty)
   implementation(libs.grpc.stub)

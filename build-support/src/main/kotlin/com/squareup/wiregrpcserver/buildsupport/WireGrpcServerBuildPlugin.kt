@@ -49,8 +49,8 @@ private lateinit var wireVersion: String
 // I cannot get the wireGrpcServerBuild extension to work in projects included via `includeBuild` within
 // `build-support`, so doing it here for now :sad:
 private val PROJECT_TO_PUBLISH = listOf(
-    "wire-grpc-server",
-    "wire-grpc-server-generator",
+    "server",
+    "server-generator",
 )
 
 @Suppress("unused") // Invoked reflectively by Gradle.

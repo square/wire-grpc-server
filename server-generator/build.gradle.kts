@@ -12,7 +12,7 @@ dependencies {
   implementation(libs.okio.core)
   api(libs.kotlinpoet)
   api(libs.protobuf.java)
-  implementation(projects.wireGrpcServer)
+  implementation(projects.server)
   testImplementation(libs.wire.schemaHandlerTests)
   testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.truth)
