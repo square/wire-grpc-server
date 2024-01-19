@@ -14,8 +14,6 @@ out/
 .gradle
 build
 generated
-gradlew
-gradlew.bat
 
 # Maven
 plugin*.xml
