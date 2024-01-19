@@ -1,0 +1,96 @@
+name: build
+
+on:
+  pull_request: {}
+  workflow_dispatch: {}
+  push:
+    branches:
+      - 'main'
+    tags-ignore:
+      - '**'
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
+
+jobs:
+  jvm:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version:
+          - 17
+          - 18
+          - 19
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: ${{ matrix.java-version }}
+
+      - name: Test
+        run: |
+          ./gradlew build --stacktrace --warning-mode all
+
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Set git to use LF and not automatically replace them with CRLF.
+        run: |
+          git config --global core.autocrlf false
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 19
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@latest
+
+      - name: Test
+        uses: nick-fields/retry@v2.9.0
+        with:
+          max_attempts: 5
+          timeout_minutes: 90
+          shell: bash
+          command: |
+            ./gradlew build --stacktrace --warning-mode all
+
+  publish-snapshot:
+    runs-on: macos-latest
+    if: github.repository == 'square/wire-grpc-server' && github.ref == 'refs/heads/main'
+    needs: [jvm]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 19
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Upload Artifacts
+        run: |
+          ./gradlew publish --stacktrace --warning-mode all --no-daemon
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_SIGNING_PRIVATE_KEY }}

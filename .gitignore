@@ -1,0 +1,27 @@
+# IDEA
+.idea
+*.iml
+classes
+
+# Eclipse
+.classpath
+.project
+
+gen/
+out/
+
+# Gradle
+.gradle
+build
+generated
+gradlew
+gradlew.bat
+
+# Maven
+plugin*.xml
+
+# SPM
+.build
+.swiftpm
+
+local.properties
