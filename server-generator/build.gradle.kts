@@ -15,8 +15,10 @@ dependencies {
   implementation(projects.server)
   testImplementation(libs.wire.schemaHandlerTests)
   testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)
   testImplementation(libs.assertj)
+  testImplementation(libs.assertk)
   testImplementation(libs.kotlin.jsr223)
 }
 

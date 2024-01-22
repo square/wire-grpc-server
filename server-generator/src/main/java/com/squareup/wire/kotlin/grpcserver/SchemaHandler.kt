@@ -15,7 +15,6 @@
  */
 package com.squareup.wire.kotlin.grpcserver
 
-import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
@@ -45,19 +44,20 @@ import java.io.IOException
 internal class GrpcServerSchemaHandler(
     options: Map<String, String>,
 ) : SchemaHandler() {
-    // TODO(Benoit) What's the default when not set?
     private val singleMethodServices =
-        options["singleMethodServices"].equals("true", ignoreCase = true)
+        options.getOrDefault(key = "singleMethodServices", defaultValue = "true")
+            .equals("true", ignoreCase = true)
 
-    // TODO(Benoit) What's the default when not set?
-    private val rpcSuspending = options["rpcCallStyle"].equals("suspending", ignoreCase = true)
+    private val rpcSuspending =
+        options.getOrDefault(key = "rpcCallStyle", defaultValue = "suspending")
+            .equals("suspending", ignoreCase = true)
 
     private lateinit var schema: Schema
     private lateinit var typeToKotlinName: Map<ProtoType, TypeName>
 
     override fun handle(schema: Schema, context: Context) {
         this.schema = schema
-        this.typeToKotlinName = buildMap {
+        typeToKotlinName = buildMap {
             fun putAll(kotlinPackage: String, enclosingClassName: ClassName?, types: List<Type>) {
                 for (type in types) {
                     val className = enclosingClassName?.nestedClass(type.type.simpleName)
@@ -70,7 +70,13 @@ internal class GrpcServerSchemaHandler(
             for (protoFile in schema.protoFiles) {
                 val kotlinPackage = javaPackage(protoFile)
                 putAll(kotlinPackage, null, protoFile.types)
+
+                for (service in protoFile.services) {
+                    val className = ClassName(kotlinPackage, service.type.simpleName)
+                    this[service.type] = className
+                }
             }
+
             this.putAll(BUILT_IN_TYPES)
         }
 
@@ -94,18 +100,16 @@ internal class GrpcServerSchemaHandler(
      * These adapters allow us to use Wire based gRPC as io.grpc.BindableService
      */
     private fun generateGrpcServerAdapter(service: Service): Map<ClassName, TypeSpec> {
-        val result = mutableMapOf<ClassName, TypeSpec>()
-
-        val protoFile: ProtoFile? = schema.protoFile(service.location.path)
-        val (grpcClassName, grpcSpec) =
-            KotlinGrpcGenerator(
-                typeToKotlinName = typeToKotlinName,
-                singleMethodServices = singleMethodServices,
-                suspendingCalls = rpcSuspending,
-            ).generateGrpcServer(service, protoFile, schema)
-        result[grpcClassName] = grpcSpec
-
-        return result
+        return buildMap {
+            val protoFile: ProtoFile? = schema.protoFile(service.location.path)
+            val (grpcClassName, grpcSpec) =
+                KotlinGrpcGenerator(
+                    typeToKotlinName = typeToKotlinName,
+                    singleMethodServices = singleMethodServices,
+                    suspendingCalls = rpcSuspending,
+                ).generateGrpcServer(service, protoFile, schema)
+            put(grpcClassName, grpcSpec)
+        }
     }
 
     private fun write(
@@ -118,15 +122,6 @@ internal class GrpcServerSchemaHandler(
         val modulePath = context.outDirectory
         val kotlinFile = FileSpec.builder(name.packageName, name.simpleName)
             .addFileComment(CODE_GENERATED_BY_WIRE)
-            .addFileComment("\nSource: %L in %L", source, location.withPathOnly())
-            // If a file contains deprecation, we don't want to pollute the consumer's logs with something
-            // they might not be able to control.
-            .addAnnotation(
-                AnnotationSpec.builder(Suppress::class)
-                    .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE)
-                    .addMember("%S", "DEPRECATION")
-                    .build(),
-            )
             .addType(typeSpec)
             .build()
         val filePath = modulePath /

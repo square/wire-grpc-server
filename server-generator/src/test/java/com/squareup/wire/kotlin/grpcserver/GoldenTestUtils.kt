@@ -31,4 +31,9 @@ object GoldenTestUtils {
 
         Assertions.assertThat(finalSpec.toString()).isEqualTo(expected)
     }
+
+    fun assertFileEquals(expectedFileName: String, otherContent: String) {
+        val expected = File("src/test/golden/$expectedFileName").source().buffer().readUtf8()
+        Assertions.assertThat(otherContent).isEqualTo(expected)
+    }
 }
