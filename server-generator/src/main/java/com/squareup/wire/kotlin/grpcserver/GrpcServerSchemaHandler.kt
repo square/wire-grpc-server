@@ -41,7 +41,7 @@ import okio.ByteString
 import okio.Path
 import java.io.IOException
 
-internal class GrpcServerSchemaHandler(
+class GrpcServerSchemaHandler(
     options: Map<String, String>,
 ) : SchemaHandler() {
     private val singleMethodServices =
