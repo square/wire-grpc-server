@@ -11,6 +11,24 @@ public final class com/squareup/wire/kotlin/grpcserver/FileDescriptorGenerator {
 	public final fun addDescriptorDataProperty (Lcom/squareup/kotlinpoet/TypeSpec$Builder;Lcom/squareup/wire/schema/ProtoFile;Lcom/squareup/wire/schema/Schema;)V
 }
 
+public final class com/squareup/wire/kotlin/grpcserver/GrpcServerSchemaHandler : com/squareup/wire/schema/SchemaHandler {
+	public static final field Companion Lcom/squareup/wire/kotlin/grpcserver/GrpcServerSchemaHandler$Companion;
+	public fun <init> (Ljava/util/Map;)V
+	public fun handle (Lcom/squareup/wire/schema/Extend;Lcom/squareup/wire/schema/Field;Lcom/squareup/wire/schema/SchemaHandler$Context;)Lokio/Path;
+	public fun handle (Lcom/squareup/wire/schema/Schema;Lcom/squareup/wire/schema/SchemaHandler$Context;)V
+	public fun handle (Lcom/squareup/wire/schema/Service;Lcom/squareup/wire/schema/SchemaHandler$Context;)Ljava/util/List;
+	public fun handle (Lcom/squareup/wire/schema/Type;Lcom/squareup/wire/schema/SchemaHandler$Context;)Lokio/Path;
+}
+
+public final class com/squareup/wire/kotlin/grpcserver/GrpcServerSchemaHandler$Companion {
+}
+
+public final class com/squareup/wire/kotlin/grpcserver/GrpcServerSchemaHandler$Factory : com/squareup/wire/schema/SchemaHandler$Factory {
+	public fun <init> ()V
+	public fun create ()Lcom/squareup/wire/schema/SchemaHandler;
+	public fun create (Ljava/util/List;Ljava/util/List;ZLjava/lang/String;Ljava/util/Map;)Lcom/squareup/wire/schema/SchemaHandler;
+}
+
 public final class com/squareup/wire/kotlin/grpcserver/ImplBaseGenerator {
 	public static final field INSTANCE Lcom/squareup/wire/kotlin/grpcserver/ImplBaseGenerator;
 }
