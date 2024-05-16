@@ -68,7 +68,7 @@ object FileDescriptorGenerator {
                 visited.add(path)
                 val file = schema.protoFile(path)
                 if (file != null) {
-                    todo.addAll(file.imports)
+                    todo.addAll(file.imports + file.publicImports)
                     encoded[file.location.path] = SchemaEncoder(schema).encode(file).base64()
                 }
             }
