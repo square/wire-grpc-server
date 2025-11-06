@@ -18,6 +18,7 @@ buildscript {
 
     classpath(libs.wire.gradlePlugin)
     classpath(libs.wire.runtime)
+    classpath("com.squareup.wiregrpcserver:server-generator")
     classpath("com.squareup.wiregrpcserver.build:gradle-plugin")
   }
 

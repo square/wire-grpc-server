@@ -152,10 +152,6 @@ class GrpcServerSchemaHandler(
 
     @Suppress("unused") // Used by the library's consumers.
     class Factory : SchemaHandler.Factory {
-        override fun create(): SchemaHandler {
-            error("Not used. Wire will remove it soon.")
-        }
-
         override fun create(
             includes: List<String>,
             excludes: List<String>,

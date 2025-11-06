@@ -4,8 +4,6 @@ plugins {
   kotlin("jvm")
 }
 
-
-
 dependencies {
   implementation(libs.wire.runtime)
   // io.grpc.stub relies on guava-android. This module relies on a -jre version of guava.

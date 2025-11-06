@@ -24,12 +24,12 @@ dependencyResolutionManagement {
 includeBuild("build-support") {
   dependencySubstitution {
     substitute(module("com.squareup.wiregrpcserver.build:gradle-plugin")).using(project(":"))
+    substitute(module("com.squareup.wiregrpcserver:server-generator")).using(project(":server-generator"))
   }
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include(":server")
-include(":server-generator")
 include(":samples:wire-grpc-sample:protos")
 include(":samples:wire-grpc-sample:server-plain")

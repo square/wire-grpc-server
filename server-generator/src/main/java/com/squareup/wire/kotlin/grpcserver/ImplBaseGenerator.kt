@@ -44,7 +44,7 @@ object ImplBaseGenerator {
         .addType(
             TypeSpec.classBuilder("${service.name}ImplBase")
                 .addModifiers(KModifier.ABSTRACT)
-                .addSuperinterface(WireBindableService::class)
+                .addSuperinterface(ClassName("com.squareup.wire.kotlin.grpcserver","WireBindableService"))
                 .apply { addImplBaseConstructor(options) }
                 .apply { addImplBaseBody(generator, this, service, options) }
                 .build(),
@@ -147,7 +147,7 @@ object ImplBaseGenerator {
                 val className = generator.classNameFor(it!!)
                 builder.addType(
                     TypeSpec.classBuilder("${it.simpleName}Marshaller")
-                        .addSuperinterface(WireMethodMarshaller::class.asClassName().parameterizedBy(className))
+                        .addSuperinterface(ClassName("com.squareup.wire.kotlin.grpcserver","WireMethodMarshaller").parameterizedBy(className))
                         .addFunction(
                             FunSpec.builder("stream")
                                 .addModifiers(KModifier.OVERRIDE)

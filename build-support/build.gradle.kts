@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -23,7 +24,7 @@ buildscript {
 plugins {
   `kotlin-dsl`
   `java-gradle-plugin`
-  kotlin("jvm") version "1.9.10"
+  kotlin("jvm") version libs.versions.kotlin
 }
 
 repositories {
@@ -77,13 +78,12 @@ allprojects {
   }
 
   tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-      jvmTarget = "11"
-      // Disable optimized callable references. See https://youtrack.jetbrains.com/issue/KT-37435
-      freeCompilerArgs += "-Xno-optimized-callable-references"
-      freeCompilerArgs += "-Xjvm-default=all"
+    compilerOptions {
+      jvmTarget.set(JvmTarget.JVM_11)
+      freeCompilerArgs.add("-Xno-optimized-callable-references")
+      freeCompilerArgs.add("-Xjvm-default=all")
       // https://kotlinlang.org/docs/whatsnew13.html#progressive-mode
-      freeCompilerArgs += "-progressive"
+      freeCompilerArgs.add("-progressive")
     }
   }
 }

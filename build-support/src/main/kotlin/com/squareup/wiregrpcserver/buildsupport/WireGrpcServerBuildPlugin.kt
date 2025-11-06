@@ -38,10 +38,12 @@ import org.gradle.kotlin.dsl.attributes
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.io.File
+import kotlin.text.set
 
 private lateinit var wireGroupId: String
 private lateinit var wireVersion: String
@@ -187,9 +189,9 @@ class WireGrpcServerBuildPlugin : Plugin<Project> {
     }
 
     private fun Project.configureCommonKotlin() {
-        tasks.withType(KotlinCompile::class.java).configureEach {
-            kotlinOptions {
-                freeCompilerArgs += listOf(
+        tasks.withType(KotlinCompilationTask::class.java).configureEach {
+            compilerOptions {
+                freeCompilerArgs.addAll(
                     // Disable optimized callable references. See https://youtrack.jetbrains.com/issue/KT-37435
                     "-Xno-optimized-callable-references",
                     // https://kotlinlang.org/docs/whatsnew13.html#progressive-mode
@@ -200,9 +202,9 @@ class WireGrpcServerBuildPlugin : Plugin<Project> {
 
         val javaVersion = JavaVersion.VERSION_1_8
         tasks.withType(KotlinJvmCompile::class.java).configureEach {
-            kotlinOptions {
-                jvmTarget = javaVersion.toString()
-                freeCompilerArgs += listOf(
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_1_8)
+                freeCompilerArgs.addAll(
                     "-Xjvm-default=all",
                 )
             }

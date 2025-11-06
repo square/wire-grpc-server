@@ -20,6 +20,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LambdaTypeName
+import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
@@ -199,19 +200,19 @@ object BindableAdapterGenerator {
                     )
                     !rpc.requestStreaming -> CodeBlock.of(
                         "return %T.serverStream(context, request, %L()::%L)",
-                        FlowAdapter::class,
+                        ClassName("com.squareup.wire.kotlin.grpcserver","FlowAdapter"),
                         serviceProviderName,
                         rpc.name,
                     )
                     !rpc.responseStreaming -> CodeBlock.of(
                         "return %T.clientStream(context, request, %L()::%L)",
-                        FlowAdapter::class,
+                        ClassName("com.squareup.wire.kotlin.grpcserver","FlowAdapter"),
                         serviceProviderName,
                         rpc.name,
                     )
                     else -> CodeBlock.of(
                         "return %T.bidiStream(context, request, %L()::%L)",
-                        FlowAdapter::class,
+                        ClassName("com.squareup.wire.kotlin.grpcserver","FlowAdapter"),
                         serviceProviderName,
                         rpc.name,
                     )
