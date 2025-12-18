@@ -205,13 +205,13 @@ public object FooServiceWireGrpc {
     }
   }
 
-  public class FooServiceBlockingStub : AbstractStub<FooServiceStub> {
+  public class FooServiceBlockingStub : AbstractStub<FooServiceBlockingStub> {
     internal constructor(channel: Channel) : super(channel)
 
     internal constructor(channel: Channel, callOptions: CallOptions) : super(channel, callOptions)
 
-    override fun build(channel: Channel, callOptions: CallOptions): FooServiceStub =
-        FooServiceStub(channel, callOptions)
+    override fun build(channel: Channel, callOptions: CallOptions): FooServiceBlockingStub =
+        FooServiceBlockingStub(channel, callOptions)
 
     public fun Call1(request: Request): Response = blockingUnaryCall(channel, getCall1Method(),
         callOptions, request)

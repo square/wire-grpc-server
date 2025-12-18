@@ -68,6 +68,7 @@ object StubGenerator {
                             this,
                             service,
                             ClassName("io.grpc.kotlin", "AbstractCoroutineStub"),
+                            false,
                         )
                         addSuspendedStubRpcCalls(generator, this, service, options)
                     }
@@ -98,7 +99,13 @@ object StubGenerator {
             .addType(
                 TypeSpec.classBuilder(stubClassName)
                     .apply {
-                        addAbstractStubConstructor(generator, this, service, ClassName("io.grpc.stub", "AbstractStub"))
+                        addAbstractStubConstructor(
+                            generator,
+                            this,
+                            service,
+                            ClassName("io.grpc.stub", "AbstractStub"),
+                            false,
+                        )
                         addStubRpcCalls(generator, this, service, options)
                     }
                     .build(),
@@ -110,12 +117,14 @@ object StubGenerator {
         builder: TypeSpec.Builder,
         service: Service,
         superClass: ClassName,
+        blockingStub: Boolean,
     ): TypeSpec.Builder {
+        val stubType = if (blockingStub) "Blocking" else ""
         val serviceClassName = generator.classNameFor(service.type)
         val stubClassName = ClassName(
             packageName = serviceClassName.packageName,
             "${serviceClassName.simpleName}WireGrpc",
-            "${serviceClassName.simpleName}Stub",
+            "${serviceClassName.simpleName}${stubType}Stub",
         )
         return builder
             // Really this is a superclass, just want to add secondary constructors.
@@ -140,8 +149,8 @@ object StubGenerator {
                     .addModifiers(KModifier.OVERRIDE)
                     .addParameter("channel", ClassName("io.grpc", "Channel"))
                     .addParameter("callOptions", ClassName("io.grpc", "CallOptions"))
-                    .addStatement("return ${service.name}Stub(channel, callOptions)")
-                    .returns(ClassName("", "${service.name}Stub"))
+                    .addStatement("return ${service.name}${stubType}Stub(channel, callOptions)")
+                    .returns(ClassName("", "${service.name}${stubType}Stub"))
                     .build(),
             )
     }

@@ -17,9 +17,12 @@ package com.squareup.wire.kotlin.grpcserver
 
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.wire.WireTestLogger
 import com.squareup.wire.buildSchema
 import com.squareup.wire.kotlin.grpcserver.GoldenTestUtils.assertFileEquals
+import com.squareup.wire.schema.SchemaHandler
 import okio.Path.Companion.toPath
+import okio.fakefilesystem.FakeFileSystem
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -185,6 +188,54 @@ class StubTest {
         )
     }
 
+    @Test
+    fun `generates stubs for blocking bidi streaming rpc`() {
+        val code = stubCodeForBlocking(
+            """
+      syntax = "proto2";
+      package test;
+
+      message Test {}
+      service TestService {
+        rpc TestRPC(stream Test) returns (stream Test){}
+      }
+            """.trimMargin(),
+        )
+        assertFileEquals("BlockingBidiStreamingService.kt", code)
+    }
+
+    @Test
+    fun `generates stubs for blocking server streaming rpc`() {
+        val code = stubCodeForBlocking(
+            """
+      syntax = "proto2";
+      package test;
+
+      message Test {}
+      service TestService {
+        rpc TestRPC(Test) returns (stream Test){}
+      }
+            """.trimMargin(),
+        )
+        assertFileEquals("BlockingServerStreamingService.kt", code)
+    }
+
+    @Test
+    fun `generates stubs for blocking client streaming rpc`() {
+        val code = stubCodeForBlocking(
+            """
+      syntax = "proto2";
+      package test;
+
+      message Test {}
+      service TestService {
+        rpc TestRPC(stream Test) returns (Test){}
+      }
+            """.trimMargin(),
+        )
+        assertFileEquals("BlockingClientStreamingService.kt", code)
+    }
+
     private fun stubCodeFor(
         pkg: String,
         serviceName: String,
@@ -206,5 +257,34 @@ class StubTest {
             .build()
             .toString()
             .trim()
+    }
+
+    private fun stubCodeForBlocking(
+        schemaCode: String,
+    ): String {
+        val fileSystem = FakeFileSystem()
+        val outDirectory = "generated/wire"
+        val protoPath = "service.proto"
+        val schema = buildSchema { add(protoPath.toPath(), schemaCode) }
+        val context = SchemaHandler.Context(
+            fileSystem = fileSystem,
+            outDirectory = outDirectory.toPath(),
+            logger = WireTestLogger(),
+            sourcePathPaths = setOf(protoPath),
+        )
+        GrpcServerSchemaHandler.Factory().create(
+            includes = listOf(),
+            excludes = listOf(),
+            exclusive = true,
+            outDirectory = outDirectory,
+            options = mapOf(
+                "singleMethodServices" to "false",
+                "rpcCallStyle" to "blocking",
+            ),
+        )
+            .handle(schema, context)
+        return fileSystem.read("generated/wire/test/TestServiceWireGrpc.kt".toPath()) {
+            readUtf8()
+        }
     }
 }

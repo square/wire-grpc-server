@@ -56,6 +56,7 @@ object BlockingStubGenerator {
                                 this,
                                 service,
                                 ClassName("io.grpc.stub", "AbstractStub"),
+                                true,
                             )
                         }
                         .addBlockingStubRpcCalls(generator, service)

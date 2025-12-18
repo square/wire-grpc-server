@@ -345,13 +345,13 @@ public object RouteGuideWireGrpc {
         response)
   }
 
-  public class RouteGuideBlockingStub : AbstractStub<RouteGuideStub> {
+  public class RouteGuideBlockingStub : AbstractStub<RouteGuideBlockingStub> {
     internal constructor(channel: Channel) : super(channel)
 
     internal constructor(channel: Channel, callOptions: CallOptions) : super(channel, callOptions)
 
-    override fun build(channel: Channel, callOptions: CallOptions): RouteGuideStub =
-        RouteGuideStub(channel, callOptions)
+    override fun build(channel: Channel, callOptions: CallOptions): RouteGuideBlockingStub =
+        RouteGuideBlockingStub(channel, callOptions)
 
     public fun GetFeature(request: Point): Feature = blockingUnaryCall(channel,
         getGetFeatureMethod(), callOptions, request)
