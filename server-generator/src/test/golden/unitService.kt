@@ -115,7 +115,7 @@ public object MyServiceWireGrpc {
   ) : WireBindableService {
     public open suspend fun doSomething(request: Unit): Unit = throw UnsupportedOperationException()
 
-    override fun bindService(): ServerServiceDefinition =
+    final override fun bindService(): ServerServiceDefinition =
         ServerServiceDefinition.builder(getServiceDescriptor()).addMethod(
                io.grpc.kotlin.ServerCalls.unaryServerMethodDefinition(
                  context = context,

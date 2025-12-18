@@ -134,7 +134,7 @@ object ImplBaseGenerator {
 
         builder.addFunction(
             FunSpec.builder("bindService")
-                .addModifiers(KModifier.OVERRIDE)
+                .addModifiers(KModifier.OVERRIDE, KModifier.FINAL)
                 .returns(ClassName("io.grpc", "ServerServiceDefinition"))
                 .addCode(bindServiceCodeBlock(service, options))
                 .build(),

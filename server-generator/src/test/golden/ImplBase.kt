@@ -28,7 +28,7 @@ public class RouteGuideWireGrpc {
     public open fun RouteChat(response: StreamObserver<RouteNote>): StreamObserver<RouteNote> =
         throw UnsupportedOperationException()
 
-    override fun bindService(): ServerServiceDefinition =
+    final override fun bindService(): ServerServiceDefinition =
         ServerServiceDefinition.builder(getServiceDescriptor()).addMethod(
               getGetFeatureMethod(),
               asyncUnaryCall(this@RouteGuideImplBase::GetFeature)

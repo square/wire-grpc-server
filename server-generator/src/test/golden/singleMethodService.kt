@@ -145,7 +145,7 @@ public object FooServiceWireGrpc {
     public open fun Call2(request: Request, response: StreamObserver<Response>): Unit = throw
         UnsupportedOperationException()
 
-    override fun bindService(): ServerServiceDefinition =
+    final override fun bindService(): ServerServiceDefinition =
         ServerServiceDefinition.builder(getServiceDescriptor()).addMethod(
               getCall1Method(),
               serverCallsAsyncUnaryCall(this@FooServiceImplBase::Call1)
